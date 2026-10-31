@@ -12,6 +12,13 @@
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/carouselTicker.css') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/odometer.css') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/main.css') }}">
+    <style>
+        .post-content { overflow-x: hidden; overflow-wrap: break-word; word-break: break-word; }
+        .post-content img { max-width: 100% !important; height: auto !important; }
+        .post-content table { max-width: 100%; overflow-x: auto; display: block; }
+        .post-content iframe, .post-content video, .post-content embed { max-width: 100%; }
+        .post-content pre { overflow-x: auto; white-space: pre-wrap; }
+    </style>
 </head>
 <body>
     {{-- Preloader --}}
@@ -190,7 +197,7 @@
             <div class="container">
                 <div class="row mt-5 g-4">
                     {{-- Main content --}}
-                    <div class="col-lg-8">
+                    <div class="col-lg-8" style="overflow-x: hidden; min-width: 0;">
                         @if($post->featured_image)
                         <img class="rounded-8 w-100 mb-4" src="{{ str_starts_with($post->featured_image, 'http') ? $post->featured_image : Storage::url($post->featured_image) }}" alt="{{ $post->title }}">
                         @endif
