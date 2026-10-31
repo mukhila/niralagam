@@ -25,6 +25,8 @@ class CategoryController extends Controller
             'icon'        => 'nullable|string|max:10',
         ]);
 
+        $data['slug'] = Category::uniqueSlug($data['name']);
+
         Category::create($data);
 
         return redirect()->route('admin.categories.index')
@@ -38,6 +40,10 @@ class CategoryController extends Controller
             'description' => 'nullable|string|max:500',
             'icon'        => 'nullable|string|max:10',
         ]);
+
+        if ($data['name'] !== $category->name) {
+            $data['slug'] = Category::uniqueSlug($data['name'], $category->id);
+        }
 
         $category->update($data);
 

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/blog/{slug}', [HomeController::class, 'show'])->name('post.show');
+Route::get('/author/{handle}', [HomeController::class, 'author'])->name('author.show');
 
 // ── Auth ────────────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {

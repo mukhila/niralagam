@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -45,5 +46,19 @@ class HomeController extends Controller
         $tags        = Tag::withCount('posts')->orderByDesc('posts_count')->limit(10)->get();
 
         return view('post', compact('post', 'related', 'recentPosts', 'tags'));
+    }
+
+    public function author(string $handle): View
+    {
+        $userId = User::idForHandle($handle);
+        $author = User::findOrFail($userId);
+
+        $posts = Post::with('category')
+            ->live()
+            ->where('user_id', $author->id)
+            ->latest('published_at')
+            ->paginate(6);
+
+        return view('author', compact('author', 'posts'));
     }
 }
