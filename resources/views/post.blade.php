@@ -171,7 +171,8 @@
                                         @if($post->user->avatar)
                                         <img class="avatar avatar-md rounded-circle" src="{{ Storage::url($post->user->avatar) }}" alt="{{ $post->user->name }}">
                                         @else
-                                        <span class="avatar avatar-md rounded-circle bg-dark d-flex align-items-center justify-content-center text-white fw-bold fs-7">{{ strtoupper(substr($post->user->name, 0, 1)) }}</span>
+                                        @php $hp = array_values(array_filter(explode(' ', $post->user->name))); $hi = strtoupper(substr($hp[0]??'',0,1).substr($hp[1]??'',0,1)); @endphp
+                                        <span class="avatar avatar-md rounded-circle d-flex align-items-center justify-content-center fw-bold fs-7" style="background:#e8f0fe;color:#3b5bdb;">{{ $hi }}</span>
                                         @endif
                                         <span class="fs-7 text-dark fw-regular">{{ $post->user->name }}</span>
                                     </a>
@@ -257,7 +258,8 @@
                                         @if($post->user->avatar)
                                         <img class="rounded-circle avatar-154" src="{{ Storage::url($post->user->avatar) }}" alt="{{ $post->user->name }}">
                                         @else
-                                        <div class="rounded-circle bg-dark d-flex align-items-center justify-content-center text-white fw-bold fs-2 mx-auto" style="width:154px;height:154px;font-size:3rem;">{{ strtoupper(substr($post->user->name, 0, 1)) }}</div>
+                                        @php $ap = array_values(array_filter(explode(' ', $post->user->name))); $ai = strtoupper(substr($ap[0]??'',0,1).substr($ap[1]??'',0,1)); @endphp
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto" style="width:154px;height:154px;font-size:3rem;background:#e8f0fe;color:#3b5bdb;">{{ $ai }}</div>
                                         @endif
                                     </div>
                                     <div class="card-body text-center">
@@ -407,7 +409,7 @@
                 <div class="row g-5 sec-padding">
                     <div class="col-lg-4 col-md-8 pe-lg-5">
                         <div class="d-flex gap-2 align-items-center">
-                            <a class="dark-mode-invert" href="{{ route('home') }}"><img src="{{ asset('theme/imgs/template/logo/logo-dark.svg') }}" alt="{{ config('app.name') }}"></a>
+                            <a href="{{ route('home') }}"><img src="{{ asset('niralagam_logo.png') }}" alt="Niralagam" style="height:36px;border-radius:8px;"></a>
                         </div>
                         <p class="fs-7 text-dark mt-4">Blending tech, life, and culture. Stay informed with fresh trends, smart insights, and expert takes across every topic that matters.</p>
                         <div class="d-inline-flex group-social-icons bg-transparent mt-3">
