@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $post->title }} - {{ config('app.name') }}</title>
-    <meta name="description" content="{{ $post->excerpt ?? Str::limit(strip_tags($post->body), 160) }}">
+    <meta name="description" content="{{ $post->excerpt ?? Str::limit(strip_tags($post->content), 160) }}">
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/bootstrap-grid.min.css') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/aos.css') }}">
@@ -18,82 +18,109 @@
     <div id="preloader">
         <div id="loader" class="loader">
             <div class="loader-container">
-                <div class="loader-icon"><img src="{{ asset('theme/imgs/template/logo/logo-gradient.svg') }}" alt="Preloader"></div>
+                <div class="loader-icon">
+                    <img src="{{ asset('niralagam_logo.png') }}" alt="Niralagam" style="height:60px;border-radius:12px;">
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Navbar style-2: nav left | logo center | actions right --}}
+    {{-- Navbar --}}
     <header>
-        <nav class="navbar navbar-expand-lg style-2">
-            <div class="navbar-collapse d-none d-lg-block start" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link link-effect-1" href="{{ route('home') }}"><span>Home</span></a></li>
-                    @foreach(\App\Models\Category::orderBy('name')->limit(4)->get() as $cat)
-                    <li class="nav-item"><a class="nav-link link-effect-1" href="#"><span>{{ $cat->name }}</span></a></li>
-                    @endforeach
-                </ul>
-            </div>
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <img class="dark-mode-invert" src="{{ asset('theme/imgs/template/logo/logo-dark.svg') }}" alt="{{ config('app.name') }}">
-            </a>
-            <div class="navbar-collapse d-none d-lg-block end">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link dark-mode-toggle" href="#">
-                            <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <nav class="navbar style-3">
+            <div class="container">
+                <div class="header d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <a class="navbar-brand fw-bold fs-3" href="{{ route('home') }}">
+                            <img src="{{ asset('niralagam_logo.png') }}" alt="Niralagam" style="height:36px;border-radius:8px;">
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-dark rounded-8 button-effect-1" href="{{ route('login') }}">Sign In</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="burger-icon burger-icon-white d-block d-lg-none">
-                <span class="burger-icon-top"></span>
-                <span class="burger-icon-mid"></span>
-                <span class="burger-icon-bottom"></span>
+                    </div>
+                    <div class="navbar-collapse d-none d-lg-block" id="navbarNav">
+                        @php $navCats = \App\Models\Category::orderBy('name')->limit(4)->get(); @endphp
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link link-effect-1" href="{{ route('home') }}"><span>Home</span></a>
+                            </li>
+                            @if($navCats->isNotEmpty())
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle link-effect-1" href="#"><span>Categories</span></a>
+                                <ul class="dropdown-menu">
+                                    @foreach($navCats as $cat)
+                                    <li><a class="dropdown-item" href="#">{{ $cat->name }}</a></li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                            @endif
+                            @auth
+                            <li class="nav-item">
+                                <a class="nav-link link-effect-1" href="{{ route('admin.dashboard') }}"><span>Admin</span></a>
+                            </li>
+                            @endauth
+                        </ul>
+                    </div>
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="group-btn-right d-flex align-items-center">
+                            <div class="dark-light-switcher">
+                                <svg class="svg-white dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10.0018 0.666664C4.85543 0.666664 0.666656 4.85406 0.666656 10.0004C0.666656 15.1468 4.85543 19.3356 10.0018 19.3356C15.1482 19.3356 19.337 15.1468 19.337 10.0004C19.337 4.85406 15.1482 0.666664 10.0018 0.666664ZM10.7212 2.13629C14.7526 2.4982 17.8982 5.87269 17.8982 10.0004C17.8982 14.1282 14.7526 17.5027 10.7212 17.8646V2.13629Z" fill="#75787D"/></svg>
+                                <svg class="svg-dark dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10.0018 0.666992C4.85543 0.666992 0.666656 4.85439 0.666656 10.0008C0.666656 15.1471 4.85543 19.3359 10.0018 19.3359C15.1482 19.3359 19.337 15.1471 19.337 10.0008C19.337 4.85439 15.1482 0.666992 10.0018 0.666992ZM10.7212 2.13662C14.7526 2.49852 17.8982 5.87302 17.8982 10.0008C17.8982 14.1285 14.7526 17.503 10.7212 17.8649V2.13662Z" fill="#0E0E0F"/></svg>
+                            </div>
+                            <a href="#" class="navbar-toggler icon-shape">
+                                <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M6.5 5.19999C6.5 4.48205 7.08206 3.89999 7.8 3.89999H24.7C25.4179 3.89999 26 4.48205 26 5.19999C26 5.91794 25.4179 6.49999 24.7 6.49999H7.8C7.08206 6.49999 6.5 5.91789 6.5 5.19999ZM24.7 11.7H1.3C0.582055 11.7 0 12.2821 0 13C0 13.7179 0.582055 14.3 1.3 14.3H24.7C25.4179 14.3 26 13.7179 26 13C26 12.2821 25.4179 11.7 24.7 11.7ZM24.7 19.5H13C12.2821 19.5 11.7 20.082 11.7 20.8C11.7 21.5179 12.2821 22.1 13 22.1H24.7C25.4179 22.1 26 21.5179 26 20.8C26 20.082 25.4179 19.5 24.7 19.5Z" fill="#0E0E0F"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
 
     {{-- Mobile Sidebar --}}
-    <div class="mobile-header-active mobile-header-wrapper-style perfect-scrollbar">
-        <div class="mobile-header-wrapper-inner">
-            <div class="mobile-header-top">
-                <div class="mobile-header-logo">
-                    <a href="{{ route('home') }}"><img src="{{ asset('theme/imgs/template/logo/logo-dark.svg') }}" alt="{{ config('app.name') }}"></a>
+    <div class="sidebar-left">
+        <div class="header-sidebar d-flex align-items-center justify-content-between py-3">
+            <a href="{{ route('home') }}" class="sidebar-brand fw-bold fs-3">
+                <img src="{{ asset('niralagam_logo.png') }}" alt="Niralagam" style="height:32px;border-radius:7px;">
+            </a>
+            <a href="#" class="close-sidebar">
+                <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17.25 6.75L6.75 17.25" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.75 6.75L17.25 17.25" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+        </div>
+        @php $mobileCats = \App\Models\Category::orderBy('name')->limit(6)->get(); @endphp
+        <ul class="sidebar-nav list-unstyled ps-0">
+            <li class="nav-item">
+                <a class="nav-link mb-2" href="{{ route('home') }}">Home</a>
+            </li>
+            @if($mobileCats->isNotEmpty())
+            <li class="nav-item collapse">
+                <a class="nav-link mb-2 collapse-toggle" href="#">Categories</a>
+                <ul class="collapse-menu d-flex flex-column gap-1 list-unstyled">
+                    @foreach($mobileCats as $cat)
+                    <li><a class="collapse-item" href="#">{{ $cat->name }}</a></li>
+                    @endforeach
+                </ul>
+            </li>
+            @endif
+            @auth
+            <li class="nav-item">
+                <a class="nav-link mb-2" href="{{ route('admin.dashboard') }}">Admin Panel</a>
+            </li>
+            @endauth
+        </ul>
+        <div class="sidebar-footer">
+            <div class="">
+                <div class="d-flex align-items-center">
+                    <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.75 7.75C4.75 6.64543 5.64543 5.75 6.75 5.75H17.25C18.3546 5.75 19.25 6.64543 19.25 7.75V16.25C19.25 17.3546 18.3546 18.25 17.25 18.25H6.75C5.64543 18.25 4.75 17.3546 4.75 16.25V7.75Z" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5L12 12.25L18.5 6.5" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="fs-7 fw-semibold">Newsletter</span>
                 </div>
-                <div class="mobile-menu-close"><span class="close-icon"></span></div>
+                <h5 class="my-2">Subscribe our newsletter</h5>
+                <p>Get the latest posts delivered to your inbox.</p>
             </div>
-            <div class="mobile-header-content-area">
-                <div class="perfect-scroll">
-                    <div class="mobile-menu-wrap mobile-header-border">
-                        <nav>
-                            <ul class="mobile-menu font-heading">
-                                <li><a href="{{ route('home') }}">Home</a></li>
-                                @foreach(\App\Models\Category::orderBy('name')->limit(6)->get() as $cat)
-                                <li><a href="#">{{ $cat->name }}</a></li>
-                                @endforeach
-                            </ul>
-                        </nav>
-                    </div>
-                    <div class="mobile-account mt-3">
-                        <a class="btn btn-dark rounded-8 w-100 button-effect-1" href="{{ route('login') }}">Sign In</a>
-                    </div>
-                    <div class="sidebar-footer mt-4">
-                        <div class="d-flex align-items-center gap-1 mb-2">
-                            <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.75 7.75C4.75 6.64543 5.64543 5.75 6.75 5.75H17.25C18.3546 5.75 19.25 6.64543 19.25 7.75V16.25C19.25 17.3546 18.3546 18.25 17.25 18.25H6.75C5.64543 18.25 4.75 17.3546 4.75 16.25V7.75Z" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5L12 12.25L18.5 6.5" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <span class="fs-7 fw-semibold">Newsletter</span>
-                        </div>
-                        <h5 class="my-2">Subscribe our newsletter</h5>
-                        <form>
-                            <input type="email" class="form-control fs-7 mb-2 w-100" placeholder="Your email address">
-                            <button type="submit" class="btn btn-dark w-100 button-effect-1">Subscribe</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <form action="#" class="w-auto">
+                <input type="email" class="form-control fs-7 mb-2 w-100" placeholder="Your email address">
+                <button type="submit" class="btn btn-dark w-100 button-effect-1">Subscribe</button>
+            </form>
+        </div>
+        <div class="text-center">
+            <p class="fs-7">{{ date('Y') }} &copy; <span class="text-dark">Niralagam.</span> All Rights Reserved</p>
         </div>
     </div>
     <div class="sidebar-overlay"></div>
@@ -132,7 +159,7 @@
                                     @endif
                                     <ul class="d-flex align-items-center text-600 m-0 ps-3">
                                         <li>
-                                            <p class="fs-8 m-0">{{ max(1, (int) ceil(str_word_count(strip_tags($post->body)) / 200)) }} mins read</p>
+                                            <p class="fs-8 m-0">{{ max(1, (int) ceil(str_word_count(strip_tags($post->content)) / 200)) }} mins read</p>
                                         </li>
                                     </ul>
                                     <h3>{{ $post->title }}</h3>
@@ -168,7 +195,7 @@
                         @endif
 
                         <div class="d-flex flex-column gap-3">
-                            {!! $post->body !!}
+                            {!! $post->content !!}
 
                             <div class="border-top mt-5 mb-1"></div>
 
@@ -282,7 +309,7 @@
                                                 <div class="d-flex align-items-center text-600">
                                                     <span class="fs-8">{{ optional($recent->published_at)->format('d M, Y') }}</span>
                                                     <ul class="ps-4 m-0">
-                                                        <li><span class="fs-8">{{ max(1, (int) ceil(str_word_count(strip_tags($recent->body)) / 200)) }} mins read</span></li>
+                                                        <li><span class="fs-8">{{ max(1, (int) ceil(str_word_count(strip_tags($recent->content)) / 200)) }} mins read</span></li>
                                                     </ul>
                                                 </div>
                                             </div>
