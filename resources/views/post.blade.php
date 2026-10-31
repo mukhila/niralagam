@@ -870,7 +870,7 @@
                                 <a href="{{ route('author.show', $post->user->handle()) }}" class="flex-shrink-0">
                                     @if($authorAvatar)
                                     <img src="{{ $authorAvatar }}" alt="{{ $authorName }}" class="rounded-circle" style="width:70px;height:70px;object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold" style="display:none;width:70px;height:70px;font-size:1.6rem;background:#e0e7ff;color:#3730a3;">{{ $authorInitials }}</div>
+                                    <div class="rounded-circle fw-bold" style="display:none;align-items:center;justify-content:center;width:70px;height:70px;font-size:1.6rem;background:#e0e7ff;color:#3730a3;">{{ $authorInitials }}</div>
                                     @else
                                     <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:70px;height:70px;font-size:1.6rem;background:#e0e7ff;color:#3730a3;">{{ $authorInitials }}</div>
                                     @endif
@@ -906,7 +906,7 @@
                                 <a href="{{ route('author.show', $post->user->handle()) }}" class="d-inline-block">
                                     @if($authorAvatar)
                                     <img src="{{ $authorAvatar }}" alt="{{ $authorName }}" class="rounded-circle shadow-sm" style="width:96px;height:96px;object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto shadow-sm" style="display:none;width:96px;height:96px;font-size:2rem;background:#e0e7ff;color:#3730a3;">{{ $authorInitials }}</div>
+                                    <div class="rounded-circle fw-bold mx-auto shadow-sm" style="display:none;align-items:center;justify-content:center;width:96px;height:96px;font-size:2rem;background:#e0e7ff;color:#3730a3;">{{ $authorInitials }}</div>
                                     @else
                                     <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto shadow-sm" style="width:96px;height:96px;font-size:2rem;background:#e0e7ff;color:#3730a3;">{{ $authorInitials }}</div>
                                     @endif
@@ -1037,7 +1037,7 @@
                         <a href="{{ route('post.show', $rel->slug) }}" class="recommended-img-link">
                             @if($relImg)
                             <img src="{{ $relImg }}" alt="{{ $rel->title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted" style="display:none;background:#e2e8f0;">
+                            <div class="w-100 h-100 text-muted" style="display:none;align-items:center;justify-content:center;background:#e2e8f0;">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                             </div>
                             @else

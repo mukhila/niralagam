@@ -48,7 +48,8 @@ Route::get('/sitemap.xml',           [SeoController::class, 'sitemap']);
 Route::get('/rss.xml',               [SeoController::class, 'rss']);
 Route::get('/robots.txt',            [SeoController::class, 'robots']);
 Route::get('/share',                 [SharePreviewController::class, 'show']);
-Route::get('/authors/{handle}',      [AuthorController::class, 'show']);
+Route::get('/authors/{handle}',       [AuthorController::class, 'show']);
+Route::get('/authors/{handle}/posts', [AuthorController::class, 'posts']);
 Route::get('/search',                [SearchController::class, 'search'])->middleware('throttle:60,1');
 
 // ── Following (signed-in readers) ───────────────────────────

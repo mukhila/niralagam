@@ -8,8 +8,10 @@ use App\Models\Post;
 use App\Models\PostView;
 use App\Models\Wishlist;
 use App\Support\Analytics\Traffic;
+use App\Support\Tenancy\CurrentTenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class EngagementController extends Controller
 {
@@ -17,6 +19,9 @@ class EngagementController extends Controller
      * Counts one view per reader (account, else IP) per post per 24h. Bots and
      * unpublished posts aren't counted. The page sends document.referrer and the
      * URL's utm_source so analytics can show where readers come from.
+     *
+     * Deduplication uses a 24h cache key so the DB is only queried on the first
+     * visit; subsequent hits within the window skip both the read and the write.
      */
     public function recordView(Request $request, Post $post): JsonResponse
     {
@@ -29,27 +34,36 @@ class EngagementController extends Controller
         $agent  = $request->userAgent();
 
         if ($post->isLive() && ! Traffic::isBot($agent)) {
-            $exists = PostView::where('post_id', $post->id)
-                ->when($userId, fn ($q) => $q->where('user_id', $userId), fn ($q) => $q->where('ip_address', $request->ip()))
-                ->where('viewed_at', '>=', now()->subHours(24))
-                ->exists();
+            $tenantId = app(CurrentTenant::class)->id();
+            $cacheKey = $this->viewCacheKey($tenantId, $post->id, $userId, $request->ip());
 
-            if (! $exists) {
-                [$source, $host] = Traffic::source(
-                    $data['referrer'] ?? null,
-                    $data['utm_source'] ?? null,
-                    $request->header('X-Tenant-Domain') ?: $request->getHost(),
-                );
+            if (! Cache::has($cacheKey)) {
+                // Cache miss: fall back to DB to guard against cache resets.
+                $alreadyViewed = PostView::where('post_id', $post->id)
+                    ->when($userId, fn ($q) => $q->where('user_id', $userId), fn ($q) => $q->where('ip_address', $request->ip()))
+                    ->where('viewed_at', '>=', now()->subHours(24))
+                    ->exists();
 
-                PostView::create([
-                    'post_id'       => $post->id,
-                    'user_id'       => $userId,
-                    'ip_address'    => $request->ip(),
-                    'user_agent'    => $agent ? substr($agent, 0, 255) : null,
-                    'source'        => $source,
-                    'referrer_host' => $host,
-                    'device'        => Traffic::device($agent),
-                ]);
+                if (! $alreadyViewed) {
+                    [$source, $host] = Traffic::source(
+                        $data['referrer'] ?? null,
+                        $data['utm_source'] ?? null,
+                        $request->header('X-Tenant-Domain') ?: $request->getHost(),
+                    );
+
+                    PostView::create([
+                        'post_id'       => $post->id,
+                        'user_id'       => $userId,
+                        'ip_address'    => $request->ip(),
+                        'user_agent'    => $agent ? substr($agent, 0, 255) : null,
+                        'source'        => $source,
+                        'referrer_host' => $host,
+                        'device'        => Traffic::device($agent),
+                    ]);
+                }
+
+                // Cache for 24h whether or not we wrote — prevents repeated DB reads.
+                Cache::put($cacheKey, true, now()->addHours(24));
             }
         }
 
@@ -96,5 +110,11 @@ class EngagementController extends Controller
             'wishlisted' => $userId ? Wishlist::where('user_id', $userId)->where('post_id', $post->id)->exists() : false,
             'bookmarked' => $userId ? Bookmark::where('user_id', $userId)->where('post_id', $post->id)->exists() : false,
         ]);
+    }
+
+    private function viewCacheKey(?int $tenantId, int $postId, ?int $userId, string $ip): string
+    {
+        $identity = $userId ? "u{$userId}" : 'i' . md5($ip);
+        return "pv:{$tenantId}:{$identity}:{$postId}";
     }
 }

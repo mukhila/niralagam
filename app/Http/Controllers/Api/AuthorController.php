@@ -38,6 +38,21 @@ class AuthorController extends Controller
         ]);
     }
 
+    public function posts(Request $request, string $handle): JsonResponse
+    {
+        $author = $this->findAuthor($handle);
+
+        $posts = Post::with(['category', 'tags', 'user:id,name,username'])
+            ->withCount(['views', 'wishlists', 'bookmarks', 'comments'])
+            ->where('user_id', $author->id)
+            ->live()
+            ->orderByDesc('published_at')
+            ->orderByDesc('id')
+            ->paginate(min((int) ($request->per_page ?? 10), 100));
+
+        return response()->json($posts);
+    }
+
     public function toggleFollowAuthor(Request $request, string $handle): JsonResponse
     {
         $author = $this->findAuthor($handle);
