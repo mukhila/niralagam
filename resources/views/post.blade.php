@@ -169,7 +169,7 @@
                                     @if($post->user)
                                     <a href="{{ route('author.show', $post->user->handle()) }}" class="author d-flex align-items-center gap-2">
                                         @if($post->user->avatar)
-                                        <img class="avatar avatar-md rounded-circle" src="{{ Storage::url($post->user->avatar) }}" alt="{{ $post->user->name }}">
+                                        <img class="avatar avatar-md rounded-circle" src="{{ str_starts_with($post->user->avatar, 'http') ? $post->user->avatar : Storage::url($post->user->avatar) }}" alt="{{ $post->user->name }}">
                                         @else
                                         @php $hp = array_values(array_filter(explode(' ', $post->user->name))); $hi = strtoupper(substr($hp[0]??'',0,1).substr($hp[1]??'',0,1)); @endphp
                                         <span class="avatar avatar-md rounded-circle d-flex align-items-center justify-content-center fw-bold fs-7" style="background:#e8f0fe;color:#3b5bdb;">{{ $hi }}</span>
@@ -192,58 +192,59 @@
                     {{-- Main content --}}
                     <div class="col-lg-8">
                         @if($post->featured_image)
-                        <img class="rounded-8 w-100 mb-4" src="{{ Storage::url($post->featured_image) }}" alt="{{ $post->title }}">
+                        <img class="rounded-8 w-100 mb-4" src="{{ str_starts_with($post->featured_image, 'http') ? $post->featured_image : Storage::url($post->featured_image) }}" alt="{{ $post->title }}">
                         @endif
 
-                        <div class="d-flex flex-column gap-3">
+                        {{-- Post body: plain block so editor HTML flows naturally --}}
+                        <div class="post-content">
                             {!! $post->content !!}
+                        </div>
 
-                            <div class="border-top mt-5 mb-1"></div>
+                        <div class="border-top mt-5 mb-4"></div>
 
-                            {{-- Tags + Share --}}
-                            <div class="d-flex flex-wrap gap-4 align-items-center justify-content-between mb-4">
-                                <div class="d-flex align-items-center gap-2 flex-wrap">
-                                    @foreach($post->tags as $tag)
-                                    <a href="#" class="tag-item"><span>{{ $tag->name }}</span></a>
-                                    @endforeach
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="text-dark">Share:</span>
-                                    <div class="d-inline-flex group-social-icons mt-0 rounded-8">
-                                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" rel="noopener" class="icon-shape icon-46">
-                                            <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M8.84863 9.20312H6.5415V16.0938H3.46533V9.20312H0.942871V6.37305H3.46533V4.18896C3.46533 1.72803 4.94189 0.34375 7.1875 0.34375C8.26416 0.34375 9.40234 0.559082 9.40234 0.559082V2.98926H8.14111C6.91064 2.98926 6.5415 3.72754 6.5415 4.52734V6.37305H9.2793L8.84863 9.20312Z" fill="black"/></svg>
-                                        </a>
-                                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($post->title) }}" target="_blank" rel="noopener" class="icon-shape icon-46">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/></svg>
-                                        </a>
-                                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->url()) }}" target="_blank" rel="noopener" class="icon-shape icon-46">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/></svg>
-                                        </a>
-                                    </div>
+                        {{-- Tags + Share --}}
+                        <div class="d-flex flex-wrap gap-4 align-items-center justify-content-between mb-5">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                @foreach($post->tags as $tag)
+                                <a href="#" class="tag-item"><span>{{ $tag->name }}</span></a>
+                                @endforeach
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-dark">Share:</span>
+                                <div class="d-inline-flex group-social-icons mt-0 rounded-8">
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" rel="noopener" class="icon-shape icon-46">
+                                        <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M8.84863 9.20312H6.5415V16.0938H3.46533V9.20312H0.942871V6.37305H3.46533V4.18896C3.46533 1.72803 4.94189 0.34375 7.1875 0.34375C8.26416 0.34375 9.40234 0.559082 9.40234 0.559082V2.98926H8.14111C6.91064 2.98926 6.5415 3.72754 6.5415 4.52734V6.37305H9.2793L8.84863 9.20312Z" fill="black"/></svg>
+                                    </a>
+                                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($post->title) }}" target="_blank" rel="noopener" class="icon-shape icon-46">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/></svg>
+                                    </a>
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->url()) }}" target="_blank" rel="noopener" class="icon-shape icon-46">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/></svg>
+                                    </a>
                                 </div>
                             </div>
+                        </div>
 
-                            {{-- Newsletter --}}
-                            <div class="block-subscribe h-100 d-flex flex-column flex-lg-row gap-3 justify-content-between bg-200 wow img-custom-anim-top">
-                                <div>
-                                    <div class="block-title d-flex align-items-center gap-1 fs-7 text-600">
-                                        <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.75 7.75C4.75 6.64543 5.64543 5.75 6.75 5.75H17.25C18.3546 5.75 19.25 6.64543 19.25 7.75V16.25C19.25 17.3546 18.3546 18.25 17.25 18.25H6.75C5.64543 18.25 4.75 17.3546 4.75 16.25V7.75Z" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5L12 12.25L18.5 6.5" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                        <span class="fs-7 fw-regular">Newsletter</span>
-                                    </div>
-                                    <div class="title">
-                                        <h5 class="mb-0">Stay Informed with <br class="d-none d-lg-block">Top Headlines</h5>
-                                    </div>
+                        {{-- Newsletter --}}
+                        <div class="block-subscribe h-100 d-flex flex-column flex-lg-row gap-3 justify-content-between bg-200 wow img-custom-anim-top">
+                            <div>
+                                <div class="block-title d-flex align-items-center gap-1 fs-7 text-600">
+                                    <svg class="dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.75 7.75C4.75 6.64543 5.64543 5.75 6.75 5.75H17.25C18.3546 5.75 19.25 6.64543 19.25 7.75V16.25C19.25 17.3546 18.3546 18.25 17.25 18.25H6.75C5.64543 18.25 4.75 17.3546 4.75 16.25V7.75Z" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5L12 12.25L18.5 6.5" stroke="#0E0E0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    <span class="fs-7 fw-regular">Newsletter</span>
                                 </div>
-                                <div class="decorate-1 mix-blend-multiply bottom-0" data-background="{{ asset('theme/imgs/template/decorate-3.png') }}"></div>
-                                <form action="#" class="position-relative">
-                                    <div class="d-flex flex-wrap flex-md-nowrap gap-2 align-items-center mb-3">
-                                        <input class="form-control" type="email" placeholder="Your email address">
-                                        <button class="btn btn-dark button-effect-1" type="submit">Subscribe</button>
-                                    </div>
-                                    <input type="checkbox" id="subscribe-post">
-                                    <label for="subscribe-post" class="text-600 fs-8">By clicking the button, you are agreeing with our <a href="#" class="text-dark">Term & Conditions</a></label>
-                                </form>
+                                <div class="title">
+                                    <h5 class="mb-0">Stay Informed with <br class="d-none d-lg-block">Top Headlines</h5>
+                                </div>
                             </div>
+                            <div class="decorate-1 mix-blend-multiply bottom-0" data-background="{{ asset('theme/imgs/template/decorate-3.png') }}"></div>
+                            <form action="#" class="position-relative">
+                                <div class="d-flex flex-wrap flex-md-nowrap gap-2 align-items-center mb-3">
+                                    <input class="form-control" type="email" placeholder="Your email address">
+                                    <button class="btn btn-dark button-effect-1" type="submit">Subscribe</button>
+                                </div>
+                                <input type="checkbox" id="subscribe-post">
+                                <label for="subscribe-post" class="text-600 fs-8">By clicking the button, you are agreeing with our <a href="#" class="text-dark">Term & Conditions</a></label>
+                            </form>
                         </div>
                     </div>
 
@@ -256,7 +257,7 @@
                                 <div class="author-card">
                                     <div class="card-img mb-4 text-center">
                                         @if($post->user->avatar)
-                                        <img class="rounded-circle avatar-154" src="{{ Storage::url($post->user->avatar) }}" alt="{{ $post->user->name }}">
+                                        <img class="rounded-circle avatar-154" src="{{ str_starts_with($post->user->avatar, 'http') ? $post->user->avatar : Storage::url($post->user->avatar) }}" alt="{{ $post->user->name }}">
                                         @else
                                         @php $ap = array_values(array_filter(explode(' ', $post->user->name))); $ai = strtoupper(substr($ap[0]??'',0,1).substr($ap[1]??'',0,1)); @endphp
                                         <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold mx-auto" style="width:154px;height:154px;font-size:3rem;background:#e8f0fe;color:#3b5bdb;">{{ $ai }}</div>
@@ -298,7 +299,7 @@
                                             <div class="hover-effect-1">
                                                 <a href="{{ route('post.show', $recent->slug) }}" class="card-img">
                                                     @if($recent->featured_image)
-                                                    <img class="w-100" src="{{ Storage::url($recent->featured_image) }}" alt="{{ $recent->title }}">
+                                                    <img class="w-100" src="{{ str_starts_with($recent->featured_image, 'http') ? $recent->featured_image : Storage::url($recent->featured_image) }}" alt="{{ $recent->title }}">
                                                     @else
                                                     <div class="w-100 bg-200" style="height:80px;border-radius:8px;"></div>
                                                     @endif
@@ -367,7 +368,7 @@
                                     <div class="position-relative card-img-top thumbnail">
                                         <a href="{{ route('post.show', $rel->slug) }}">
                                             @if($rel->featured_image)
-                                            <img src="{{ Storage::url($rel->featured_image) }}" alt="{{ $rel->title }}" class="cover-image">
+                                            <img src="{{ str_starts_with($rel->featured_image, 'http') ? $rel->featured_image : Storage::url($rel->featured_image) }}" alt="{{ $rel->title }}" class="cover-image">
                                             @else
                                             <div class="cover-image bg-200"></div>
                                             @endif
