@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/blog/{slug}', [HomeController::class, 'show'])->name('post.show');
 Route::get('/author/{handle}', [HomeController::class, 'author'])->name('author.show');
+Route::get('/sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap');
+Route::get('/robots.txt', [HomeController::class, 'robots'])->name('robots');
 
 // ── Auth ────────────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {

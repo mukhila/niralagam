@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $author->name }} - {{ config('app.name') }}</title>
     <meta name="description" content="{{ $author->bio ?? 'Posts by ' . $author->name }}">
+    <link rel="sitemap" type="application/xml" href="{{ route('sitemap') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z3Z0LEKRP4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Z3Z0LEKRP4');
+    </script>
+
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/bootstrap-grid.min.css') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/aos.css') }}">
@@ -59,6 +70,12 @@
                         </ul>
                     </div>
                     <div class="d-flex align-items-center gap-4">
+                        @guest
+                        <a href="{{ route('login') }}" class="btn btn-dark btn-sm rounded-pill px-3 py-1 fs-8 fw-semibold d-none d-lg-inline-flex align-items-center gap-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Login
+                        </a>
+                        @endguest
                         <div class="group-btn-right d-flex align-items-center">
                             <div class="dark-light-switcher">
                                 <svg class="svg-white dark-mode-invert" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10.0018 0.666664C4.85543 0.666664 0.666656 4.85406 0.666656 10.0004C0.666656 15.1468 4.85543 19.3356 10.0018 19.3356C15.1482 19.3356 19.337 15.1468 19.337 10.0004C19.337 4.85406 15.1482 0.666664 10.0018 0.666664ZM10.7212 2.13629C14.7526 2.4982 17.8982 5.87269 17.8982 10.0004C17.8982 14.1282 14.7526 17.5027 10.7212 17.8646V2.13629Z" fill="#75787D"/></svg>
@@ -102,6 +119,10 @@
             @auth
             <li class="nav-item">
                 <a class="nav-link mb-2" href="{{ route('admin.dashboard') }}">Admin Panel</a>
+            </li>
+            @else
+            <li class="nav-item">
+                <a class="nav-link mb-2" href="{{ route('login') }}">Login</a>
             </li>
             @endauth
         </ul>

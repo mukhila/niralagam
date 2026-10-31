@@ -6,6 +6,7 @@
     <title>{{ $post->meta_title ?: $post->title }} — {{ config('app.name', 'Niralagam') }}</title>
     <meta name="description" content="{{ $post->meta_description ?: ($post->excerpt ?: Str::limit(strip_tags($post->content), 160)) }}">
     <link rel="canonical" href="{{ route('post.show', $post->slug) }}">
+    <link rel="sitemap" type="application/xml" href="{{ route('sitemap') }}">
 
     {{-- Open Graph / Facebook --}}
     <meta property="og:type" content="article">
@@ -39,6 +40,15 @@
     @endif
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('niralagam_logo.png') }}">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z3Z0LEKRP4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Z3Z0LEKRP4');
+    </script>
 
     {{-- Theme CSS --}}
     <link rel="stylesheet" href="{{ asset('theme/css/vendors/bootstrap-grid.min.css') }}">
@@ -615,8 +625,14 @@
                         </ul>
                     </div>
 
-                    {{-- Right Controls (Theme switcher + Mobile toggle) --}}
+                    {{-- Right Controls (Login + Theme switcher + Mobile toggle) --}}
                     <div class="d-flex align-items-center gap-3">
+                        @guest
+                        <a href="{{ route('login') }}" class="btn btn-dark btn-sm rounded-pill px-3 py-1 fs-8 fw-semibold d-none d-lg-inline-flex align-items-center gap-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Login
+                        </a>
+                        @endguest
                         <div class="group-btn-right d-flex align-items-center">
                             {{-- Dark / Light theme toggle --}}
                             <div class="dark-light-switcher" role="button" aria-label="Toggle Dark Mode" title="Toggle theme">
