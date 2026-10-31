@@ -21,7 +21,7 @@ class TagController extends Controller
     {
         $request->validate(['name' => 'required|string|max:100']);
 
-        Tag::create(['name' => $request->name]);
+        Tag::create(['name' => $request->name, 'slug' => Tag::uniqueSlug($request->name)]);
 
         return redirect()->route('admin.tags.index')
             ->with('success', 'Tag created.');
@@ -31,7 +31,12 @@ class TagController extends Controller
     {
         $request->validate(['name' => 'required|string|max:100']);
 
-        $tag->update(['name' => $request->name]);
+        $data = ['name' => $request->name];
+        if ($request->name !== $tag->name) {
+            $data['slug'] = Tag::uniqueSlug($request->name, $tag->id);
+        }
+
+        $tag->update($data);
 
         return redirect()->route('admin.tags.index')
             ->with('success', 'Tag updated.');
